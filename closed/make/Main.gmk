@@ -22,8 +22,14 @@ clean-j9vm :
 	$(call CleanComponent,vm)
 
 .PHONY : \
+<<<<<<< HEAD
 	j9vm-build \
 	j9vm-compose-buildjvm \
+=======
+	build-j9vm \
+	clean-j9vm \
+	debug-image \
+>>>>>>> c991f28783... Add debug-image build target
 	test-image \
 	test-image-openj9 \
 	#
@@ -35,11 +41,25 @@ OPENSSL_MAKE := $(MAKE) -f $(SRC_ROOT)/closed/openssl.gmk SPEC=$(SPEC)
 openssl-build :
 	+$(OPENSSL_MAKE)
 
+<<<<<<< HEAD
 j9vm-build : openssl-build
 	+$(OPENJ9_MAKE) build-j9
 
 j9vm-compose-buildjvm : j9vm-build
 	+$(OPENJ9_MAKE) stage_openj9_build_jdk
+=======
+build-j9vm : start-make
+  ifeq ($(BUILD_OPENSSL),yes)
+	@$(MAKE) $(MAKE_ARGS) -f $(SRC_ROOT)/closed/openssl.gmk
+  endif # BUILD_OPENSSL
+	@$(MAKE) $(MAKE_ARGS) -f $(SRC_ROOT)/closed/OpenJ9.gmk build-j9vm
+	@$(MAKE) $(MAKE_ARGS) -f $(SRC_ROOT)/closed/CopyToBuildJdk.gmk
+
+all : debug-image
+
+debug-image : images
+	@$(MAKE) $(MAKE_ARGS) -f $(SRC_ROOT)/closed/DebugImage.gmk
+>>>>>>> c991f28783... Add debug-image build target
 
 all : test-image
 
@@ -47,7 +67,11 @@ test-image : test-image-openj9
 
 # If not cross-compiling, capture 'java -version' output.
 test-image-openj9 : images
+<<<<<<< HEAD
 	+$(OPENJ9_MAKE) openj9_test_image
+=======
+	@$(MAKE) $(MAKE_ARGS) -f $(SRC_ROOT)/closed/TestImage.gmk
+>>>>>>> c991f28783... Add debug-image build target
 ifneq ($(COMPILE_TYPE), cross)
 	$(JRE_IMAGE_DIR)/bin/java -version 2>&1 | $(TEE) $(IMAGES_OUTPUTDIR)/test/openj9/java-version.txt
 endif
